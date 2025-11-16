@@ -9,7 +9,7 @@ import { id as idLocale } from 'date-fns/locale';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CalendarCheck, FileText, CheckCircle, Loader2, Camera, Upload } from 'lucide-react';
+import { CalendarCheck, FileText, CheckCircle, Loader2, Camera, Upload, SwitchCamera } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,9 @@ export function DashboardCards() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isCameraTabActive, setIsCameraTabActive] = useState(false);
+
+  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
+  const [activeCameraIndex, setActiveCameraIndex] = useState(0);
 
   const fetchData = async () => {
     if (!user) return;
@@ -83,34 +86,41 @@ export function DashboardCards() {
 
   useEffect(() => {
     return () => {
-      // Cleanup camera stream on component unmount
       stopCamera();
     };
   }, []);
   
-  const getCameraPermission = async () => {
-      if (!isCameraTabActive) {
-          stopCamera();
-          return;
-      }
-      
-      try {
-          const stream = await navigator.mediaDevices.getUserMedia({video: true});
-          setHasCameraPermission(true);
-  
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-      } catch (error) {
-          console.error('Error accessing camera:', error);
-          setHasCameraPermission(false);
-          toast({
-            variant: 'destructive',
-            title: 'Akses Kamera Ditolak',
-            description: 'Mohon izinkan akses kamera di pengaturan browser Anda untuk menggunakan fitur ini.',
-          });
-      }
+  const getCameraPermission = async (deviceId?: string) => {
+    stopCamera();
+    try {
+        const videoConstraints: MediaTrackConstraints = deviceId ? { deviceId: { exact: deviceId } } : true;
+        const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+
+        const allDevices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = allDevices.filter(device => device.kind === 'videoinput');
+        setCameras(videoDevices);
+
+    } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Akses Kamera Ditolak',
+          description: 'Mohon izinkan akses kamera di pengaturan browser Anda untuk menggunakan fitur ini.',
+        });
+    }
   };
+
+  const handleSwitchCamera = () => {
+    const nextCameraIndex = (activeCameraIndex + 1) % cameras.length;
+    setActiveCameraIndex(nextCameraIndex);
+    getCameraPermission(cameras[nextCameraIndex].deviceId);
+  }
 
   useEffect(() => {
       if (isCameraTabActive) {
@@ -248,7 +258,7 @@ export function DashboardCards() {
             )}
         </CardContent>
         <CardFooter>
-            <Dialog onOpenChange={(open) => { if (!open) setIsCameraTabActive(false); }}>
+            <Dialog onOpenChange={(open) => { if (!open) { setIsCameraTabActive(false); stopCamera(); } }}>
                 <DialogTrigger asChild>
                     <Button variant="outline" disabled={!nextDuty.attended}>
                         {submittedReport ? 'Lihat Laporan' : 'Kirim Laporan'}
@@ -279,7 +289,15 @@ export function DashboardCards() {
                                 <Input id="picture" type="file" accept="image/*" onChange={handleFileUpload} />
                             </TabsContent>
                             <TabsContent value="camera" className="flex flex-col gap-2">
-                                <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted playsInline/>
+                                <div className="relative">
+                                    <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted playsInline/>
+                                    {cameras.length > 1 && (
+                                        <Button onClick={handleSwitchCamera} size="icon" variant="secondary" className="absolute top-2 right-2 rounded-full">
+                                            <SwitchCamera />
+                                            <span className="sr-only">Ganti Kamera</span>
+                                        </Button>
+                                    )}
+                                </div>
                                 <canvas ref={canvasRef} className="hidden"></canvas>
                                 {isCameraTabActive && hasCameraPermission === false && (
                                     <Alert variant="destructive">
@@ -289,7 +307,7 @@ export function DashboardCards() {
                                         </AlertDescription>
                                     </Alert>
                                 )}
-                                <Button onClick={handleCapture} disabled={!hasCameraPermission}>Ambil Gambar</Button>
+                                <Button onClick={handleCapture} disabled={hasCameraPermission !== true}>Ambil Gambar</Button>
                             </TabsContent>
                         </Tabs>
                         )}
@@ -301,16 +319,16 @@ export function DashboardCards() {
                             </div>
                         )}
                     </div>
-                    <DialogFooter className="mt-auto pt-4 border-t">
-                    <DialogClose asChild data-dialog-close>
-                        <Button variant="ghost">Tutup</Button>
-                    </DialogClose>
-                    {!submittedReport && (
-                        <Button onClick={handleReportSubmit} disabled={isSubmittingReport || !reportContent}>
-                            {isSubmittingReport && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Kirim
-                        </Button>
-                    )}
+                    <DialogFooter className="mt-auto pt-4 border-t shrink-0">
+                        <DialogClose asChild data-dialog-close>
+                            <Button variant="ghost">Tutup</Button>
+                        </DialogClose>
+                        {!submittedReport && (
+                            <Button onClick={handleReportSubmit} disabled={isSubmittingReport || !reportContent}>
+                                {isSubmittingReport && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Kirim
+                            </Button>
+                        )}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
