@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -61,7 +62,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = { user, loading, login, logout };
 
-  if (loading && !user) {
+  // This check was removed in the previous turn, but it's important to keep the app from showing a blank screen while loading.
+  // We'll let the child components decide whether to show a loader or not based on the loading state.
+  // However, the initial loading of the auth state should be handled here to prevent flicker.
+  if (loading) {
      return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
