@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { mockApi } from '@/lib/data';
 import type { Duty, User } from '@/lib/types';
 import { format, parseISO } from 'date-fns';
+import { id as idLocale } from 'date-fns/locale';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -49,7 +50,7 @@ export function ScheduleManager() {
             setDuties(enrichedDuties);
             setUsers(usersData.filter(u => u.role === 'warga'));
         } catch (error) {
-            console.error("Failed to fetch schedule", error);
+            console.error("Gagal mengambil jadwal", error);
         } finally {
             setLoading(false);
         }
@@ -77,10 +78,10 @@ export function ScheduleManager() {
     const handleDelete = async (dutyId: string) => {
         const success = await mockApi.deleteDuty(dutyId);
         if (success) {
-            toast({ title: 'Success', description: 'Duty has been deleted.' });
+            toast({ title: 'Sukses', description: 'Jadwal tugas telah dihapus.' });
             await fetchAllData();
         } else {
-            toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete duty.' });
+            toast({ variant: 'destructive', title: 'Error', description: 'Gagal menghapus jadwal tugas.' });
         }
     }
 
@@ -91,55 +92,55 @@ export function ScheduleManager() {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Manage Schedule</CardTitle>
+                <CardTitle>Kelola Jadwal</CardTitle>
                 <Button size="sm" onClick={() => handleOpenDialog()}>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Duty
+                    Tambah Tugas
                 </Button>
             </CardHeader>
             <CardContent>
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Resident</TableHead>
+                            <TableHead>Tanggal</TableHead>
+                            <TableHead>Warga</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-right">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {duties.map(duty => (
                             <TableRow key={duty.id}>
-                                <TableCell className="font-medium">{format(parseISO(duty.date), 'PPPP')}</TableCell>
+                                <TableCell className="font-medium">{format(parseISO(duty.date), 'PPPP', { locale: idLocale })}</TableCell>
                                 <TableCell>{duty.user?.name || 'N/A'}</TableCell>
                                 <TableCell>
                                     <Badge variant={duty.attended ? 'default' : 'secondary'} className={duty.attended ? 'bg-green-500' : ''}>
                                         {duty.attended ? <Check className="mr-1 h-3 w-3"/> : <X className="mr-1 h-3 w-3"/>}
-                                        {duty.attended ? 'Attended' : 'Pending'}
+                                        {duty.attended ? 'Hadir' : 'Menunggu'}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(duty)}>
                                         <Pencil className="h-4 w-4" />
-                                        <span className="sr-only">Edit</span>
+                                        <span className="sr-only">Ubah</span>
                                     </Button>
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
                                                 <Trash2 className="h-4 w-4" />
-                                                <span className="sr-only">Delete</span>
+                                                <span className="sr-only">Hapus</span>
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
-                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    This action cannot be undone. This will permanently delete the duty scheduled for {duty.user?.name} on {format(parseISO(duty.date), 'PPPP')}.
+                                                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus tugas yang dijadwalkan untuk {duty.user?.name} pada {format(parseISO(duty.date), 'PPPP', { locale: idLocale })} secara permanen.
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDelete(duty.id)}>Delete</AlertDialogAction>
+                                                <AlertDialogCancel>Batal</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(duty.id)}>Hapus</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>

@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/sidebar"
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/schedule', label: 'Schedule', icon: CalendarDays },
+  { href: '/dashboard', label: 'Dasbor', icon: LayoutDashboard },
+  { href: '/schedule', label: 'Jadwal', icon: CalendarDays },
   { href: '/admin', label: 'Admin', icon: Shield, adminOnly: true },
 ];
 

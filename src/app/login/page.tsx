@@ -8,9 +8,9 @@ export default function LoginPage() {
         <div className="mb-8 flex flex-col items-center">
             <ShieldCheck className="h-12 w-12 text-primary" />
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground font-headline">
-                Jaga RT App
+                Aplikasi Jaga RT
             </h1>
-            <p className="text-muted-foreground">Welcome back! Please sign in.</p>
+            <p className="text-muted-foreground">Selamat datang kembali! Silakan masuk.</p>
         </div>
         <LoginForm />
       </div>

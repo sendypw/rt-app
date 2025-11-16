@@ -40,7 +40,7 @@ export function UserNav() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              House No. {user.houseNumber}
+              No. Rumah {user.houseNumber}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -48,13 +48,13 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem disabled>
             <UserIcon className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>Profil</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>Keluar</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

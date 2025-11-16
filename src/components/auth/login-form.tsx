@@ -13,8 +13,8 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '../ui/card';
 
 const formSchema = z.object({
-  houseNumber: z.string().min(1, 'House number is required'),
-  password: z.string().min(1, 'Password is required'),
+  houseNumber: z.string().min(1, 'Nomor rumah harus diisi'),
+  password: z.string().min(1, 'Kata sandi harus diisi'),
 });
 
 export function LoginForm() {
@@ -38,7 +38,7 @@ export function LoginForm() {
     if (success) {
       router.push('/dashboard');
     } else {
-      setError('Invalid house number or password.');
+      setError('Nomor rumah atau kata sandi tidak valid.');
       setIsSubmitting(false);
     }
   }
@@ -53,9 +53,9 @@ export function LoginForm() {
               name="houseNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>House Number</FormLabel>
+                  <FormLabel>Nomor Rumah</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., A1" {...field} />
+                    <Input placeholder="cth., A1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -66,7 +66,7 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Kata Sandi</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -79,7 +79,7 @@ export function LoginForm() {
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
+              Masuk
             </Button>
           </CardFooter>
         </form>

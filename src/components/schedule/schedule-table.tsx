@@ -5,6 +5,7 @@ import { mockApi } from '@/lib/data';
 import type { Duty, User } from '@/lib/types';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { format, parseISO, isPast } from 'date-fns';
+import { id as idLocale } from 'date-fns/locale';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,7 +37,7 @@ export function ScheduleTable() {
                 
                 setDuties(enrichedDuties);
             } catch (error) {
-                console.error("Failed to fetch schedule", error);
+                console.error("Gagal mengambil jadwal", error);
             } finally {
                 setLoading(false);
             }
@@ -53,8 +54,8 @@ export function ScheduleTable() {
         if (!fromDuty || !toDuty) {
             toast({
                 variant: 'destructive',
-                title: 'Swap Request Failed',
-                description: 'Could not find a valid upcoming duty to swap from.'
+                title: 'Permintaan Tukar Gagal',
+                description: 'Tidak dapat menemukan jadwal tugas mendatang yang valid untuk ditukar.'
             });
             return;
         }
@@ -67,8 +68,8 @@ export function ScheduleTable() {
         });
         
         toast({
-            title: 'Swap Request Sent',
-            description: `Your request to swap with ${toDuty.user?.name} has been sent.`,
+            title: 'Permintaan Tukar Terkirim',
+            description: `Permintaan Anda untuk bertukar dengan ${toDuty.user?.name} telah terkirim.`,
         });
     }
 
@@ -79,38 +80,38 @@ export function ScheduleTable() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Upcoming Duties</CardTitle>
+                <CardTitle>Tugas Mendatang</CardTitle>
             </CardHeader>
             <CardContent>
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Day</TableHead>
-                            <TableHead>Resident</TableHead>
-                            <TableHead>House No.</TableHead>
+                            <TableHead>Tanggal</TableHead>
+                            <TableHead>Hari</TableHead>
+                            <TableHead>Warga</TableHead>
+                            <TableHead>No. Rumah</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Action</TableHead>
+                            <TableHead className="text-right">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {duties.map(duty => (
                             <TableRow key={duty.id} className={duty.userId === currentUser?.id ? 'bg-primary/10' : ''}>
-                                <TableCell className="font-medium">{format(parseISO(duty.date), 'MMMM dd, yyyy')}</TableCell>
-                                <TableCell>{format(parseISO(duty.date), 'EEEE')}</TableCell>
+                                <TableCell className="font-medium">{format(parseISO(duty.date), 'dd MMMM yyyy', { locale: idLocale })}</TableCell>
+                                <TableCell>{format(parseISO(duty.date), 'EEEE', { locale: idLocale })}</TableCell>
                                 <TableCell>{duty.user?.name || 'N/A'}</TableCell>
                                 <TableCell>{duty.user?.houseNumber || 'N/A'}</TableCell>
                                 <TableCell>
                                     <Badge variant={duty.attended ? 'default' : 'secondary'} className={duty.attended ? 'bg-green-500' : ''}>
                                         {duty.attended ? <Check className="mr-1 h-3 w-3"/> : <X className="mr-1 h-3 w-3"/>}
-                                        {duty.attended ? 'Attended' : 'Pending'}
+                                        {duty.attended ? 'Hadir' : 'Menunggu'}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     {duty.userId !== currentUser?.id && !isPast(parseISO(duty.date)) && (
                                          <Button variant="ghost" size="sm" onClick={() => handleSwapRequest(duty.id)}>
                                             <ArrowRightLeft className="mr-2 h-4 w-4" />
-                                            Request Swap
+                                            Minta Tukar
                                          </Button>
                                     )}
                                 </TableCell>

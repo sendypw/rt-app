@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns'
+import { id as idLocale } from 'date-fns/locale';
 import { Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -42,9 +43,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 
 const formSchema = z.object({
-  userId: z.string().min(1, 'Resident is required'),
+  userId: z.string().min(1, 'Warga harus diisi'),
   date: z.date({
-    required_error: 'A date is required.',
+    required_error: 'Tanggal harus diisi.',
   }),
 });
 
@@ -84,14 +85,14 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
     try {
         if (duty) {
             await mockApi.updateDuty(duty.id, dutyData);
-            toast({ title: 'Success', description: 'Duty has been updated.' });
+            toast({ title: 'Sukses', description: 'Jadwal tugas telah diperbarui.' });
         } else {
             await mockApi.addDuty(dutyData);
-            toast({ title: 'Success', description: 'New duty has been added.' });
+            toast({ title: 'Sukses', description: 'Jadwal tugas baru telah ditambahkan.' });
         }
         onSave();
     } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to save duty.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan jadwal tugas.' });
     }
   }
 
@@ -99,9 +100,9 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
     <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>{duty ? 'Edit Duty' : 'Add New Duty'}</DialogTitle>
+                <DialogTitle>{duty ? 'Ubah Tugas' : 'Tambah Tugas Baru'}</DialogTitle>
                 <DialogDescription>
-                    {duty ? 'Update the details for this duty.' : 'Assign a new duty to a resident.'}
+                    {duty ? 'Perbarui detail untuk tugas ini.' : 'Berikan tugas baru kepada seorang warga.'}
                 </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -112,11 +113,11 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
                             name="userId"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Resident</FormLabel>
+                                <FormLabel>Warga</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select a resident" />
+                                        <SelectValue placeholder="Pilih seorang warga" />
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -134,7 +135,7 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
                             name="date"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                <FormLabel>Duty Date</FormLabel>
+                                <FormLabel>Tanggal Tugas</FormLabel>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                     <FormControl>
@@ -146,9 +147,9 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
                                         )}
                                         >
                                         {field.value ? (
-                                            format(field.value, 'PPP')
+                                            format(field.value, 'PPP', { locale: idLocale })
                                         ) : (
-                                            <span>Pick a date</span>
+                                            <span>Pilih tanggal</span>
                                         )}
                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                         </Button>
@@ -156,6 +157,7 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
+                                        locale={idLocale}
                                         mode="single"
                                         selected={field.value}
                                         onSelect={field.onChange}
@@ -172,10 +174,10 @@ export function EditDutyDialog({ isOpen, onClose, onSave, duty, users }: EditDut
                         />
                     </div>
                     <DialogFooter>
-                        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                        <Button variant="ghost" onClick={onClose}>Batal</Button>
                         <Button type="submit" disabled={form.formState.isSubmitting}>
                             {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save
+                            Simpan
                         </Button>
                     </DialogFooter>
                 </form>

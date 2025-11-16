@@ -4,8 +4,8 @@ import { AuthProvider } from '@/lib/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Jaga RT App',
-  description: 'Community duty scheduling and management app.',
+  title: 'Aplikasi Jaga RT',
+  description: 'Aplikasi penjadwalan dan manajemen tugas komunitas.',
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

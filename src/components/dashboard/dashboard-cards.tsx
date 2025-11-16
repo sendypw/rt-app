@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { mockApi } from '@/lib/data';
 import type { Duty, Report } from '@/lib/types';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
+import { id as idLocale } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CalendarCheck, FileText, CheckCircle, Loader2 } from 'lucide-react';
@@ -51,7 +52,7 @@ export function DashboardCards() {
         }
 
       } catch (error) {
-        console.error("Failed to fetch dashboard data", error);
+        console.error("Gagal mengambil data dasbor", error);
       } finally {
         setLoading(false);
       }
@@ -67,8 +68,8 @@ export function DashboardCards() {
     if(updatedDuty) {
         setNextDuty(updatedDuty);
         toast({
-            title: "Attendance Recorded",
-            description: "Thank you for checking in for your duty.",
+            title: "Kehadiran Dicatat",
+            description: "Terima kasih telah melakukan check-in untuk tugas Anda.",
         });
     }
     setIsCheckingIn(false);
@@ -86,8 +87,8 @@ export function DashboardCards() {
     setIsSubmittingReport(false);
     setReportContent("");
     toast({
-        title: "Report Submitted",
-        description: "Your duty report has been successfully submitted.",
+        title: "Laporan Terkirim",
+        description: "Laporan tugas Anda telah berhasil dikirim.",
     });
     // Find the button with data-dialog-close and click it
     const closeButton = document.querySelector('[data-dialog-close]') as HTMLElement;
@@ -96,7 +97,7 @@ export function DashboardCards() {
 
   if (loading) {
     return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card><CardHeader><CardTitle>Loading...</CardTitle></CardHeader><CardContent><Loader2 className="h-8 w-8 animate-spin text-primary" /></CardContent></Card>
+        <Card><CardHeader><CardTitle>Memuat...</CardTitle></CardHeader><CardContent><Loader2 className="h-8 w-8 animate-spin text-primary" /></CardContent></Card>
     </div>;
   }
   
@@ -104,10 +105,10 @@ export function DashboardCards() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><CalendarCheck/> My Next Duty</CardTitle>
+          <CardTitle className="flex items-center gap-2"><CalendarCheck/> Tugas Berikutnya</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>You have no upcoming duties scheduled.</p>
+          <p>Anda tidak memiliki jadwal tugas yang akan datang.</p>
         </CardContent>
       </Card>
     );
@@ -119,62 +120,62 @@ export function DashboardCards() {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><CalendarCheck/> My Next Duty</CardTitle>
-          <CardDescription>Your upcoming community watch schedule.</CardDescription>
+          <CardTitle className="flex items-center gap-2"><CalendarCheck/> Tugas Berikutnya</CardTitle>
+          <CardDescription>Jadwal siskamling Anda yang akan datang.</CardDescription>
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-4xl font-bold text-primary font-headline">{format(dutyDate, 'dd')}</p>
-          <p className="text-lg text-muted-foreground">{format(dutyDate, 'MMMM yyyy')}</p>
-          <p className="font-semibold">{format(dutyDate, 'EEEE')}</p>
+          <p className="text-lg text-muted-foreground">{format(dutyDate, 'MMMM yyyy', { locale: idLocale })}</p>
+          <p className="font-semibold">{format(dutyDate, 'EEEE', { locale: idLocale })}</p>
         </CardContent>
         <CardFooter>
             {isToday(dutyDate) && !nextDuty.attended && (
                 <Button onClick={handleCheckIn} disabled={isCheckingIn}>
                     {isCheckingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Check-in Now
+                    Check-in Sekarang
                 </Button>
             )}
             {isToday(dutyDate) && nextDuty.attended && (
                 <div className="flex items-center text-green-600 gap-2">
                     <CheckCircle />
-                    <span>Checked-in</span>
+                    <span>Sudah Check-in</span>
                 </div>
             )}
-            {isFuture(dutyDate) && <p className="text-sm text-muted-foreground">Check-in will be available on the duty date.</p>}
+            {isFuture(dutyDate) && <p className="text-sm text-muted-foreground">Check-in akan tersedia pada tanggal tugas.</p>}
         </CardFooter>
       </Card>
 
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><FileText/> Duty Report</CardTitle>
-          <CardDescription>Submit your report after completing your duty.</CardDescription>
+          <CardTitle className="flex items-center gap-2"><FileText/> Laporan Tugas</CardTitle>
+          <CardDescription>Kirim laporan Anda setelah menyelesaikan tugas.</CardDescription>
         </CardHeader>
         <CardContent className="flex-grow">
             {submittedReport ? (
                 <div>
-                    <p className="font-semibold text-green-600">Report Submitted!</p>
+                    <p className="font-semibold text-green-600">Laporan Terkirim!</p>
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{submittedReport.content}</p>
                 </div>
             ) : (
-                <p className="text-muted-foreground">You can submit your report after your duty is completed.</p>
+                <p className="text-muted-foreground">Anda dapat mengirimkan laporan setelah tugas Anda selesai.</p>
             )}
         </CardContent>
         <CardFooter>
             <Dialog>
                 <DialogTrigger asChild>
                     <Button variant="outline" disabled={!nextDuty.attended || !!submittedReport}>
-                        {submittedReport ? 'View Report' : 'Submit Report'}
+                        {submittedReport ? 'Lihat Laporan' : 'Kirim Laporan'}
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                    <DialogTitle>Duty Report for {format(dutyDate, 'PPPP')}</DialogTitle>
+                    <DialogTitle>Laporan Tugas untuk {format(dutyDate, 'PPPP', { locale: idLocale })}</DialogTitle>
                     <DialogDescription>
-                        Please provide a brief summary of your duty shift. Note any incidents or observations.
+                        Harap berikan ringkasan singkat tentang giliran tugas Anda. Catat setiap insiden atau pengamatan.
                     </DialogDescription>
                     </DialogHeader>
                     <Textarea
-                        placeholder="e.g., Everything was calm and secure. No unusual activity observed."
+                        placeholder="cth., Semuanya tenang dan aman. Tidak ada aktivitas yang tidak biasa yang diamati."
                         rows={6}
                         value={submittedReport ? submittedReport.content : reportContent}
                         onChange={(e) => setReportContent(e.target.value)}
@@ -182,12 +183,12 @@ export function DashboardCards() {
                     />
                     <DialogFooter>
                     <DialogClose asChild data-dialog-close>
-                        <Button variant="ghost">Cancel</Button>
+                        <Button variant="ghost">Batal</Button>
                     </DialogClose>
                     {!submittedReport && (
                         <Button onClick={handleReportSubmit} disabled={isSubmittingReport}>
                             {isSubmittingReport && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Submit
+                            Kirim
                         </Button>
                     )}
                     </DialogFooter>

@@ -10,9 +10,9 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-8">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight font-headline">
-                    Welcome back, {user?.name.split(' ')[0]}!
+                    Selamat datang kembali, {user?.name.split(' ')[0]}!
                 </h1>
-                <p className="text-muted-foreground">Here's what's happening in your community today.</p>
+                <p className="text-muted-foreground">Inilah yang terjadi di komunitas Anda hari ini.</p>
             </div>
             <DashboardCards />
         </div>
