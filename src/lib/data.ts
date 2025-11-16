@@ -28,7 +28,17 @@ for (let i = 0; i < 30; i++) {
 
 // --- MOCK REPORTS AND SWAPS ---
 let reports: Report[] = [];
-let swapRequests: SwapRequest[] = [];
+let swapRequests: SwapRequest[] = [
+    {
+        id: 'swap-1',
+        fromDutyId: duties[2].id,
+        toDutyId: duties[3].id,
+        fromUserId: duties[2].userId,
+        toUserId: duties[3].userId,
+        reason: 'Ada acara keluarga mendadak.',
+        status: 'pending',
+    }
+];
 
 // --- MOCK API FUNCTIONS ---
 
@@ -88,5 +98,24 @@ export const mockApi = {
     };
     swapRequests.push(newRequest);
     return newRequest;
+  },
+  updateSwapRequestStatus: async(requestId: string, status: 'approved' | 'rejected'): Promise<SwapRequest | undefined> => {
+    const requestIndex = swapRequests.findIndex(r => r.id === requestId);
+    if (requestIndex === -1) return undefined;
+
+    swapRequests[requestIndex].status = status;
+
+    if (status === 'approved') {
+        const req = swapRequests[requestIndex];
+        const fromDutyIndex = duties.findIndex(d => d.id === req.fromDutyId);
+        const toDutyIndex = duties.findIndex(d => d.id === req.toDutyId);
+
+        if (fromDutyIndex > -1 && toDutyIndex > -1) {
+            const fromUserId = duties[fromDutyIndex].userId;
+            duties[fromDutyIndex].userId = duties[toDutyIndex].userId;
+            duties[toDutyIndex].userId = fromUserId;
+        }
+    }
+    return swapRequests[requestIndex];
   }
 };

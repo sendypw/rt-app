@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, CalendarDays, Shield } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Shield, Bell } from 'lucide-react';
 import {
     SidebarMenu,
     SidebarMenuItem,
@@ -14,6 +14,7 @@ import {
 const navItems = [
   { href: '/dashboard', label: 'Dasbor', icon: LayoutDashboard },
   { href: '/schedule', label: 'Jadwal', icon: CalendarDays },
+  { href: '/notifications', label: 'Notifikasi', icon: Bell },
   { href: '/admin', label: 'Admin', icon: Shield, adminOnly: true },
 ];
 

@@ -17,6 +17,7 @@ export interface Report {
   dutyId: string;
   userId: string;
   content: string;
+  photo?: string; // data URL of the image
   submittedAt: string; // ISO date-time string
 }
 
@@ -26,5 +27,6 @@ export interface SwapRequest {
   toDutyId: string;
   fromUserId: string;
   toUserId: string;
+  reason: string;
   status: 'pending' | 'approved' | 'rejected';
 }

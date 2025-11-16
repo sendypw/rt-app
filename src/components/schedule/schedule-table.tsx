@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRightLeft, Check, Loader2, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { SwapRequestDialog } from './swap-request-dialog';
 
 type EnrichedDuty = Duty & { user: User | undefined };
 
@@ -20,38 +21,45 @@ export function ScheduleTable() {
     const { toast } = useToast();
     const [duties, setDuties] = useState<EnrichedDuty[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isSwapDialogOpen, setIsSwapDialogOpen] = useState(false);
+    const [selectedDuty, setSelectedDuty] = useState<EnrichedDuty | null>(null);
+
+    const fetchSchedule = async () => {
+        setLoading(true);
+        try {
+            const [dutiesData, usersData] = await Promise.all([
+                mockApi.getSchedule(),
+                mockApi.getUsers(),
+            ]);
+
+            const enrichedDuties = dutiesData.map(duty => ({
+                ...duty,
+                user: usersData.find(u => u.id === duty.userId)
+            })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            
+            setDuties(enrichedDuties);
+        } catch (error) => {
+            console.error("Gagal mengambil jadwal", error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        async function fetchSchedule() {
-            setLoading(true);
-            try {
-                const [dutiesData, usersData] = await Promise.all([
-                    mockApi.getSchedule(),
-                    mockApi.getUsers(),
-                ]);
-
-                const enrichedDuties = dutiesData.map(duty => ({
-                    ...duty,
-                    user: usersData.find(u => u.id === duty.userId)
-                })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-                
-                setDuties(enrichedDuties);
-            } catch (error) {
-                console.error("Gagal mengambil jadwal", error);
-            } finally {
-                setLoading(false);
-            }
-        }
         fetchSchedule();
     }, []);
 
-    const handleSwapRequest = async (toDutyId: string) => {
-        if (!currentUser) return;
+    const openSwapDialog = (duty: EnrichedDuty) => {
+        setSelectedDuty(duty);
+        setIsSwapDialogOpen(true);
+    }
+    
+    const handleSwapRequest = async (reason: string) => {
+        if (!currentUser || !selectedDuty) return;
 
         const fromDuty = duties.find(d => d.userId === currentUser.id && !isPast(parseISO(d.date)));
-        const toDuty = duties.find(d => d.id === toDutyId);
-
-        if (!fromDuty || !toDuty) {
+        
+        if (!fromDuty) {
             toast({
                 variant: 'destructive',
                 title: 'Permintaan Tukar Gagal',
@@ -62,15 +70,17 @@ export function ScheduleTable() {
 
         await mockApi.createSwapRequest({
             fromDutyId: fromDuty.id,
-            toDutyId: toDuty.id,
+            toDutyId: selectedDuty.id,
             fromUserId: currentUser.id,
-            toUserId: toDuty.userId
+            toUserId: selectedDuty.userId!,
+            reason: reason,
         });
         
         toast({
             title: 'Permintaan Tukar Terkirim',
-            description: `Permintaan Anda untuk bertukar dengan ${toDuty.user?.name} telah terkirim.`,
+            description: `Permintaan Anda untuk bertukar dengan ${selectedDuty.user?.name} telah terkirim.`,
         });
+        setIsSwapDialogOpen(false);
     }
 
     if (loading) {
@@ -109,7 +119,7 @@ export function ScheduleTable() {
                                 </TableCell>
                                 <TableCell className="text-right">
                                     {duty.userId !== currentUser?.id && !isPast(parseISO(duty.date)) && (
-                                         <Button variant="ghost" size="sm" onClick={() => handleSwapRequest(duty.id)}>
+                                         <Button variant="ghost" size="sm" onClick={() => openSwapDialog(duty)}>
                                             <ArrowRightLeft className="mr-2 h-4 w-4" />
                                             Minta Tukar
                                          </Button>
@@ -120,6 +130,14 @@ export function ScheduleTable() {
                     </TableBody>
                 </Table>
             </CardContent>
+            {selectedDuty && (
+                 <SwapRequestDialog
+                    isOpen={isSwapDialogOpen}
+                    onClose={() => setIsSwapDialogOpen(false)}
+                    onSubmit={handleSwapRequest}
+                    toUser={selectedDuty.user!}
+                 />
+            )}
         </Card>
     );
 }
