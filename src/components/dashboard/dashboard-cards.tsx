@@ -39,6 +39,7 @@ export function DashboardCards() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isCameraTabActive, setIsCameraTabActive] = useState(false);
 
   const fetchData = async () => {
     if (!user) return;
@@ -72,25 +73,24 @@ export function DashboardCards() {
     fetchData();
   }, [user]);
 
+  const stopCamera = () => {
+      if (videoRef.current?.srcObject) {
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach(track => track.stop());
+          videoRef.current.srcObject = null;
+      }
+  }
+
   useEffect(() => {
     return () => {
-      // Cleanup camera stream
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
+      // Cleanup camera stream on component unmount
+      stopCamera();
     };
   }, []);
   
   const getCameraPermission = async () => {
-      if (hasCameraPermission) {
-          // Turn off camera
-          if (videoRef.current?.srcObject) {
-              const stream = videoRef.current.srcObject as MediaStream;
-              stream.getTracks().forEach(track => track.stop());
-              videoRef.current.srcObject = null;
-              setHasCameraPermission(false);
-          }
+      if (!isCameraTabActive) {
+          stopCamera();
           return;
       }
       
@@ -112,6 +112,15 @@ export function DashboardCards() {
       }
   };
 
+  useEffect(() => {
+      if (isCameraTabActive) {
+          getCameraPermission();
+      } else {
+          stopCamera();
+      }
+  }, [isCameraTabActive]);
+
+
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
         const context = canvasRef.current.getContext('2d');
@@ -121,7 +130,7 @@ export function DashboardCards() {
             context.drawImage(videoRef.current, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
             const dataUrl = canvasRef.current.toDataURL('image/jpeg');
             setPhoto(dataUrl);
-            getCameraPermission(); // Turn off camera
+            setIsCameraTabActive(false); // Turn off camera by changing tab state
         }
     }
   };
@@ -239,58 +248,60 @@ export function DashboardCards() {
             )}
         </CardContent>
         <CardFooter>
-            <Dialog onOpenChange={() => { if(hasCameraPermission) getCameraPermission() }}>
+            <Dialog onOpenChange={(open) => { if (!open) setIsCameraTabActive(false); }}>
                 <DialogTrigger asChild>
                     <Button variant="outline" disabled={!nextDuty.attended}>
                         {submittedReport ? 'Lihat Laporan' : 'Kirim Laporan'}
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
                     <DialogHeader>
                     <DialogTitle>Laporan Tugas untuk {format(dutyDate, 'PPPP', { locale: idLocale })}</DialogTitle>
                     <DialogDescription>
                         Harap berikan ringkasan singkat tentang giliran tugas Anda. Catat setiap insiden atau pengamatan dan sertakan foto jika perlu.
                     </DialogDescription>
                     </DialogHeader>
-                    <Textarea
-                        placeholder="cth., Semuanya tenang dan aman. Tidak ada aktivitas yang tidak biasa yang diamati."
-                        rows={5}
-                        value={submittedReport ? submittedReport.content : reportContent}
-                        onChange={(e) => setReportContent(e.target.value)}
-                        readOnly={!!submittedReport}
-                    />
-                    {!submittedReport && (
-                    <Tabs defaultValue="upload">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="upload"><Upload className="mr-2"/> Unggah File</TabsTrigger>
-                            <TabsTrigger value="camera" onClick={getCameraPermission}><Camera className="mr-2"/> Ambil Foto</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="upload">
-                            <Input id="picture" type="file" accept="image/*" onChange={handleFileUpload} />
-                        </TabsContent>
-                        <TabsContent value="camera" className="flex flex-col gap-2">
-                            <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted />
-                            <canvas ref={canvasRef} className="hidden"></canvas>
-                             {hasCameraPermission === false && (
-                                <Alert variant="destructive">
-                                    <AlertTitle>Akses Kamera Diperlukan</AlertTitle>
-                                    <AlertDescription>
-                                        Mohon izinkan akses kamera untuk menggunakan fitur ini.
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-                            <Button onClick={handleCapture} disabled={!hasCameraPermission}>Ambil Gambar</Button>
-                        </TabsContent>
-                    </Tabs>
-                    )}
-                     {photo && (
-                        <div className="mt-4">
-                            <p className="font-medium text-sm mb-2">Pratinjau Foto:</p>
-                            <Image src={photo} alt="Pratinjau Laporan" width={400} height={300} className="rounded-md object-cover" />
-                             {!submittedReport && <Button variant="link" size="sm" className="text-destructive" onClick={() => setPhoto(null)}>Hapus Foto</Button>}
-                        </div>
-                    )}
-                    <DialogFooter>
+                    <div className='flex-grow overflow-y-auto -mx-6 px-6 space-y-4'>
+                        <Textarea
+                            placeholder="cth., Semuanya tenang dan aman. Tidak ada aktivitas yang tidak biasa yang diamati."
+                            rows={5}
+                            value={submittedReport ? submittedReport.content : reportContent}
+                            onChange={(e) => setReportContent(e.target.value)}
+                            readOnly={!!submittedReport}
+                        />
+                        {!submittedReport && (
+                        <Tabs defaultValue="upload" onValueChange={(value) => setIsCameraTabActive(value === 'camera')}>
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="upload"><Upload className="mr-2"/> Unggah File</TabsTrigger>
+                                <TabsTrigger value="camera"><Camera className="mr-2"/> Ambil Foto</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="upload">
+                                <Input id="picture" type="file" accept="image/*" onChange={handleFileUpload} />
+                            </TabsContent>
+                            <TabsContent value="camera" className="flex flex-col gap-2">
+                                <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted playsInline/>
+                                <canvas ref={canvasRef} className="hidden"></canvas>
+                                {isCameraTabActive && hasCameraPermission === false && (
+                                    <Alert variant="destructive">
+                                        <AlertTitle>Akses Kamera Diperlukan</AlertTitle>
+                                        <AlertDescription>
+                                            Mohon izinkan akses kamera untuk menggunakan fitur ini.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+                                <Button onClick={handleCapture} disabled={!hasCameraPermission}>Ambil Gambar</Button>
+                            </TabsContent>
+                        </Tabs>
+                        )}
+                        {photo && (
+                            <div className="mt-4">
+                                <p className="font-medium text-sm mb-2">Pratinjau Foto:</p>
+                                <Image src={photo} alt="Pratinjau Laporan" width={400} height={300} className="rounded-md object-cover w-full h-auto" />
+                                {!submittedReport && <Button variant="link" size="sm" className="text-destructive px-0" onClick={() => setPhoto(null)}>Hapus Foto</Button>}
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter className="mt-auto pt-4 border-t">
                     <DialogClose asChild data-dialog-close>
                         <Button variant="ghost">Tutup</Button>
                     </DialogClose>
