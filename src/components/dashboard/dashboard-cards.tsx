@@ -60,9 +60,6 @@ export function DashboardCards() {
           const allReports = await mockApi.getReports();
           const report = allReports.find(r => r.dutyId === upcomingDuty.id) || null;
           setSubmittedReport(report);
-          if (report?.photo) {
-            setPhoto(report.photo);
-          }
       }
 
     } catch (error) {
@@ -93,7 +90,7 @@ export function DashboardCards() {
   const getCameraPermission = async (deviceId?: string) => {
     stopCamera();
     try {
-        const videoConstraints: MediaTrackConstraints = deviceId ? { deviceId: { exact: deviceId } } : true;
+        const videoConstraints: MediaTrackConstraints = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: 'user' };
         const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
         setHasCameraPermission(true);
 
@@ -191,6 +188,21 @@ export function DashboardCards() {
     closeButton?.click();
   };
 
+  const handleOpenReportDialog = () => {
+      setReportContent(submittedReport ? submittedReport.content : "");
+      setPhoto(submittedReport ? submittedReport.photo || null : null);
+  }
+
+  const handleCloseReportDialog = (open: boolean) => {
+      if (!open) {
+          setIsCameraTabActive(false);
+          stopCamera();
+          setReportContent("");
+          setPhoto(null);
+      }
+  }
+
+
   if (loading) {
     return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card><CardHeader><CardTitle>Memuat...</CardTitle></CardHeader><CardContent><Loader2 className="h-8 w-8 animate-spin text-primary" /></CardContent></Card>
@@ -258,9 +270,9 @@ export function DashboardCards() {
             )}
         </CardContent>
         <CardFooter>
-            <Dialog onOpenChange={(open) => { if (!open) { setIsCameraTabActive(false); stopCamera(); } }}>
+            <Dialog onOpenChange={handleCloseReportDialog}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" disabled={!nextDuty.attended}>
+                    <Button variant="outline" disabled={!nextDuty.attended} onClick={handleOpenReportDialog}>
                         {submittedReport ? 'Lihat Laporan' : 'Kirim Laporan'}
                     </Button>
                 </DialogTrigger>
@@ -275,7 +287,7 @@ export function DashboardCards() {
                         <Textarea
                             placeholder="cth., Semuanya tenang dan aman. Tidak ada aktivitas yang tidak biasa yang diamati."
                             rows={5}
-                            value={submittedReport ? submittedReport.content : reportContent}
+                            value={reportContent}
                             onChange={(e) => setReportContent(e.target.value)}
                             readOnly={!!submittedReport}
                         />
@@ -291,7 +303,7 @@ export function DashboardCards() {
                             <TabsContent value="camera" className="flex flex-col gap-2">
                                 <div className="relative">
                                     <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted playsInline/>
-                                    {cameras.length > 1 && (
+                                    {hasCameraPermission && cameras.length > 1 && (
                                         <Button onClick={handleSwitchCamera} size="icon" variant="secondary" className="absolute top-2 right-2 rounded-full">
                                             <SwitchCamera />
                                             <span className="sr-only">Ganti Kamera</span>
@@ -307,7 +319,7 @@ export function DashboardCards() {
                                         </AlertDescription>
                                     </Alert>
                                 )}
-                                <Button onClick={handleCapture} disabled={hasCameraPermission !== true}>Ambil Gambar</Button>
+                                <Button onClick={handleCapture} disabled={!hasCameraPermission}>Ambil Gambar</Button>
                             </TabsContent>
                         </Tabs>
                         )}
@@ -337,3 +349,5 @@ export function DashboardCards() {
     </div>
   );
 }
+
+    
