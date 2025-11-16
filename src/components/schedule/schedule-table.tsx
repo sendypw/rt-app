@@ -38,7 +38,7 @@ export function ScheduleTable() {
             })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
             
             setDuties(enrichedDuties);
-        } catch (error) => {
+        } catch (error) {
             console.error("Gagal mengambil jadwal", error);
         } finally {
             setLoading(false);

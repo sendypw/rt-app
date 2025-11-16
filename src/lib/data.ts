@@ -1,5 +1,5 @@
-import type { User, Duty, Report, SwapRequest } from './types';
-import { addDays, format } from 'date-fns';
+import type { User, Duty, Report, SwapRequest, Notification, EnrichedSwapRequest } from './types';
+import { addDays, format, subDays, isSameDay } from 'date-fns';
 
 // --- MOCK USERS ---
 const users: User[] = [
@@ -13,7 +13,7 @@ const users: User[] = [
 
 // --- MOCK DUTY SCHEDULE ---
 let duties: Duty[] = [];
-const startDate = new Date();
+const today = new Date();
 const wargaUsers = users.filter(u => u.role === 'warga');
 
 for (let i = 0; i < 30; i++) {
@@ -21,7 +21,7 @@ for (let i = 0; i < 30; i++) {
   duties.push({
     id: `duty-${i + 1}`,
     userId: wargaUsers[userIndex].id,
-    date: format(addDays(startDate, i), 'yyyy-MM-dd'),
+    date: format(addDays(today, i), 'yyyy-MM-dd'),
     attended: false,
   });
 }
@@ -89,6 +89,50 @@ export const mockApi = {
   },
   getSwapRequests: async (): Promise<SwapRequest[]> => {
     return [...swapRequests];
+  },
+  getNotifications: async (userId: string): Promise<Notification[]> => {
+    const user = await mockApi.getUserById(userId);
+    if (!user) return [];
+
+    const allSwapRequests = await mockApi.getSwapRequests();
+    const allDuties = await mockApi.getSchedule();
+    const allUsers = await mockApi.getUsers();
+
+    // 1. Swap Request Notifications
+    const userSwapRequests = allSwapRequests.filter(req => req.toUserId === userId || req.fromUserId === userId);
+    const swapRequestNotifications: Notification[] = userSwapRequests.map(req => {
+        const enrichedReq: EnrichedSwapRequest = {
+            ...req,
+            fromUser: allUsers.find(u => u.id === req.fromUserId)!,
+            toUser: allUsers.find(u => u.id === req.toUserId)!,
+            fromDuty: allDuties.find(d => d.id === req.fromDutyId)!,
+            toDuty: allDuties.find(d => d.id === req.toDutyId)!,
+        };
+        return {
+            id: `notif-swap-${req.id}`,
+            type: 'swap_request',
+            createdAt: new Date().toISOString(), // Mock creation date
+            swapRequest: enrichedReq,
+        };
+    });
+
+    // 2. Duty Reminder Notifications
+    const reminderNotifications: Notification[] = [];
+    const tomorrow = addDays(new Date(), 1);
+    const upcomingDuty = allDuties.find(d => d.userId === userId && isSameDay(new Date(d.date), tomorrow));
+    
+    if (upcomingDuty) {
+        reminderNotifications.push({
+            id: `notif-reminder-${upcomingDuty.id}`,
+            type: 'duty_reminder',
+            createdAt: new Date().toISOString(), // Mock creation date
+            duty: upcomingDuty,
+            user: user,
+        });
+    }
+
+    const allNotifications = [...swapRequestNotifications, ...reminderNotifications];
+    return allNotifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
   createSwapRequest: async(requestData: Omit<SwapRequest, 'id' | 'status'>): Promise<SwapRequest> => {
     const newRequest: SwapRequest = {
