@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardCards } from '@/components/dashboard/dashboard-cards';
 import { useAuth } from '@/lib/hooks/use-auth';
 
