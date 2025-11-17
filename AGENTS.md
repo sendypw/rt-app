@@ -50,6 +50,7 @@ Semua teks yang akan ditampilkan kepada pengguna (UI labels, pesan error, notifi
   - **`/types.ts`**: Definisi tipe TypeScript global.
   - **`/utils.ts`**: Fungsi utilitas umum (misal: `cn` untuk classnames).
 - **`/src/ai`**: Berisi semua logika terkait Kecerdasan Buatan (AI) menggunakan Genkit.
+- **`/docs`**: Berisi dokumentasi untuk setiap fitur aplikasi.
 
 ## 5. Styling & Antarmuka Pengguna (UI)
 
@@ -69,7 +70,13 @@ Semua teks yang akan ditampilkan kepada pengguna (UI labels, pesan error, notifi
 - **`mockApi`**: Untuk saat ini, semua operasi data (membaca, menulis, memperbarui) **harus** melalui fungsi-fungsi yang tersedia di `mockApi` dalam file `src/lib/data.ts`.
 - **Asinkron:** Semua fungsi data di `mockApi` bersifat asinkron (`async/await`) untuk mensimulasikan panggilan API sebenarnya. Tangani status `loading` dan `error` dengan benar di komponen.
 
-## 8. Prinsip Desain & Pengalaman Pengguna (UX)
+## 8. Dokumentasi Fitur
+
+- **Wajib Diperbarui:** Setiap kali ada **penambahan fitur baru** atau **perubahan signifikan** pada fitur yang sudah ada, dokumentasi terkait di dalam folder `/docs` **wajib** dibuat atau diperbarui.
+- **Jelas & Sederhana:** Dokumentasi harus ditulis dari sudut pandang pengguna akhir, menggunakan bahasa yang mudah dipahami dan tidak teknis.
+- **Satu File per Fitur:** Setiap fitur utama harus memiliki file Markdown-nya sendiri (contoh: `01-login.md`, `02-dasbor.md`).
+
+## 9. Prinsip Desain & Pengalaman Pengguna (UX)
 
 - **Mudah Digunakan:** Aplikasi yang dibangun **harus** intuitif, tidak membingungkan, dan mudah dipahami oleh pengguna akhir (warga dan admin RT).
 - **Alur yang Jelas:** Setiap fitur harus memiliki alur yang logis dan mudah diikuti.
