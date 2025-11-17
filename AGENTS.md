@@ -68,3 +68,9 @@ Semua teks yang akan ditampilkan kepada pengguna (UI labels, pesan error, notifi
 
 - **`mockApi`**: Untuk saat ini, semua operasi data (membaca, menulis, memperbarui) **harus** melalui fungsi-fungsi yang tersedia di `mockApi` dalam file `src/lib/data.ts`.
 - **Asinkron:** Semua fungsi data di `mockApi` bersifat asinkron (`async/await`) untuk mensimulasikan panggilan API sebenarnya. Tangani status `loading` dan `error` dengan benar di komponen.
+
+## 8. Prinsip Desain & Pengalaman Pengguna (UX)
+
+- **Mudah Digunakan:** Aplikasi yang dibangun **harus** intuitif, tidak membingungkan, dan mudah dipahami oleh pengguna akhir (warga dan admin RT).
+- **Alur yang Jelas:** Setiap fitur harus memiliki alur yang logis dan mudah diikuti.
+- **Fokus pada Tujuan:** Tujuan utama aplikasi adalah menyederhanakan dan mengelola proses siskamling, bukan menambah kerumitan.
