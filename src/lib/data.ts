@@ -44,15 +44,19 @@ let swapRequests: SwapRequest[] = [
 
 export const mockApi = {
   getUsers: async (): Promise<User[]> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
     return [...users];
   },
   getUserById: async (id: string): Promise<User | undefined> => {
+    await new Promise(resolve => setTimeout(resolve, 50));
     return users.find(u => u.id === id);
   },
   getSchedule: async (): Promise<Duty[]> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
     return [...duties];
   },
   updateDuty: async (dutyId: string, updates: Partial<Duty>): Promise<Duty | undefined> => {
+    await new Promise(resolve => setTimeout(resolve, 200));
     const dutyIndex = duties.findIndex(d => d.id === dutyId);
     if (dutyIndex > -1) {
       duties[dutyIndex] = { ...duties[dutyIndex], ...updates };
@@ -61,6 +65,7 @@ export const mockApi = {
     return undefined;
   },
   addDuty: async(newDutyData: Omit<Duty, 'id' | 'attended'>): Promise<Duty> => {
+    await new Promise(resolve => setTimeout(resolve, 200));
     const newDuty: Duty = {
       ...newDutyData,
       id: `duty-${Date.now()}`,
@@ -71,14 +76,17 @@ export const mockApi = {
     return newDuty;
   },
   deleteDuty: async(dutyId: string): Promise<boolean> => {
+    await new Promise(resolve => setTimeout(resolve, 200));
     const initialLength = duties.length;
     duties = duties.filter(d => d.id !== dutyId);
     return duties.length < initialLength;
   },
   getReports: async (): Promise<Report[]> => {
+    await new Promise(resolve => setTimeout(resolve, 100));
     return [...reports];
   },
   submitReport: async (reportData: Omit<Report, 'id' | 'submittedAt'>): Promise<Report> => {
+    await new Promise(resolve => setTimeout(resolve, 400));
     const newReport: Report = {
       ...reportData,
       id: `report-${Date.now()}`,
@@ -88,9 +96,11 @@ export const mockApi = {
     return newReport;
   },
   getSwapRequests: async (): Promise<SwapRequest[]> => {
+    await new Promise(resolve => setTimeout(resolve, 100));
     return [...swapRequests];
   },
   getNotifications: async (userId: string): Promise<Notification[]> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
     const user = await mockApi.getUserById(userId);
     if (!user) return [];
 
@@ -135,6 +145,7 @@ export const mockApi = {
     return allNotifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
   createSwapRequest: async(requestData: Omit<SwapRequest, 'id' | 'status'>): Promise<SwapRequest> => {
+    await new Promise(resolve => setTimeout(resolve, 400));
     const newRequest: SwapRequest = {
       ...requestData,
       id: `swap-${Date.now()}`,
@@ -144,6 +155,7 @@ export const mockApi = {
     return newRequest;
   },
   updateSwapRequestStatus: async(requestId: string, status: 'approved' | 'rejected'): Promise<SwapRequest | undefined> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
     const requestIndex = swapRequests.findIndex(r => r.id === requestId);
     if (requestIndex === -1) return undefined;
 

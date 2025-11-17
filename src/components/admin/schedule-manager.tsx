@@ -50,7 +50,7 @@ export function ScheduleManager() {
             setDuties(enrichedDuties);
             setUsers(usersData.filter(u => u.role === 'warga'));
         } catch (error) {
-            console.error("Gagal mengambil jadwal", error);
+            console.error("Failed to fetch schedule", error);
         } finally {
             setLoading(false);
         }

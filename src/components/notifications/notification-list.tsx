@@ -33,7 +33,7 @@ export function NotificationList() {
             const allNotifications = await mockApi.getNotifications(user.id);
             setNotifications(allNotifications);
         } catch (error) {
-            console.error("Gagal mengambil notifikasi:", error);
+            console.error("Failed to fetch notifications:", error);
             toast({ variant: 'destructive', title: 'Error', description: 'Gagal memuat notifikasi.' });
         } finally {
             setLoading(false);
@@ -41,7 +41,9 @@ export function NotificationList() {
     };
     
     useEffect(() => {
-        fetchNotifications();
+        if (user) {
+            fetchNotifications();
+        }
     }, [user]);
 
     const handleResponse = async (requestId: string, status: 'approved' | 'rejected') => {

@@ -63,7 +63,7 @@ export function DashboardCards() {
       }
 
     } catch (error) {
-      console.error("Gagal mengambil data dasbor", error);
+      console.error("Failed to fetch dashboard data", error);
     } finally {
       setLoading(false);
     }
@@ -349,5 +349,3 @@ export function DashboardCards() {
     </div>
   );
 }
-
-    

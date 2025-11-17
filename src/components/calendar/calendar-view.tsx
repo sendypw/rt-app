@@ -35,7 +35,7 @@ export function CalendarView() {
                 
                 setDuties(enrichedDuties);
             } catch (error) {
-                console.error("Gagal mengambil jadwal", error);
+                console.error("Failed to fetch schedule", error);
             } finally {
                 setLoading(false);
             }
