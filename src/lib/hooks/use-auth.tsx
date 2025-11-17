@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (houseNumber: string, password: string) => {
     setLoading(true);
     // Static password check as per requirements
-    if (password === 'password123') {
+    if (password === 'password123' || password === 'aa11aa') {
       const users = await mockApi.getUsers();
       const foundUser = users.find(u => u.houseNumber.toLowerCase() === houseNumber.toLowerCase());
       
