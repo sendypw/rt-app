@@ -167,7 +167,7 @@ export function NotificationList() {
     );
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 bg-red-100">
             {notifications.map(n => {
                 if (n.type === 'swap_request') {
                     const req = n.swapRequest as EnrichedSwapRequest;
