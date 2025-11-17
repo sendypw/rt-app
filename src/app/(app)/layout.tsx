@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarInset } from '@/components/ui/sidebar';
 import Header from '@/components/shared/header';
 import MainNav from '@/components/shared/main-nav';
 import { ShieldCheck } from 'lucide-react';
@@ -29,7 +29,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-        <div className="flex min-h-screen w-full flex-col bg-background">
+        <div className="flex min-h-screen w-full bg-background">
             <Sidebar>
                 <SidebarHeader className="p-4">
                     <div className="flex items-center gap-2">
@@ -45,9 +45,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </Sidebar>
             <SidebarInset>
                 <Header />
-                <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8">
+                <div className="flex-1 p-4 sm:px-6 sm:py-6">
                     {children}
-                </main>
+                </div>
             </SidebarInset>
         </div>
     </SidebarProvider>

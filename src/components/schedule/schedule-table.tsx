@@ -92,8 +92,8 @@ export function ScheduleTable() {
             <CardHeader>
                 <CardTitle>Tugas Mendatang</CardTitle>
             </CardHeader>
-            <CardContent>
-                <Table>
+            <CardContent className="overflow-x-auto">
+                <Table className="min-w-[800px]">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Tanggal</TableHead>
