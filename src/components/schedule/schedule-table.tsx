@@ -92,43 +92,45 @@ export function ScheduleTable() {
             <CardHeader>
                 <CardTitle>Tugas Mendatang</CardTitle>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
-                <Table className="min-w-[800px]">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Tanggal</TableHead>
-                            <TableHead>Hari</TableHead>
-                            <TableHead>Warga</TableHead>
-                            <TableHead>No. Rumah</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {duties.map(duty => (
-                            <TableRow key={duty.id} className={duty.userId === currentUser?.id ? 'bg-primary/10' : ''}>
-                                <TableCell className="font-medium">{format(parseISO(duty.date), 'dd MMMM yyyy', { locale: idLocale })}</TableCell>
-                                <TableCell>{format(parseISO(duty.date), 'EEEE', { locale: idLocale })}</TableCell>
-                                <TableCell>{duty.user?.name || 'N/A'}</TableCell>
-                                <TableCell>{duty.user?.houseNumber || 'N/A'}</TableCell>
-                                <TableCell>
-                                    <Badge variant={duty.attended ? 'default' : 'secondary'} className={duty.attended ? 'bg-green-500' : ''}>
-                                        {duty.attended ? <Check className="mr-1 h-3 w-3"/> : <X className="mr-1 h-3 w-3"/>}
-                                        {duty.attended ? 'Hadir' : 'Menunggu'}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    {duty.userId !== currentUser?.id && !isPast(parseISO(duty.date)) && (
-                                         <Button variant="ghost" size="sm" onClick={() => openSwapDialog(duty)}>
-                                            <ArrowRightLeft className="mr-2 h-4 w-4" />
-                                            Minta Tukar
-                                         </Button>
-                                    )}
-                                </TableCell>
+            <CardContent>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Tanggal</TableHead>
+                                <TableHead>Hari</TableHead>
+                                <TableHead>Warga</TableHead>
+                                <TableHead>No. Rumah</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Aksi</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {duties.map(duty => (
+                                <TableRow key={duty.id} className={duty.userId === currentUser?.id ? 'bg-primary/10' : ''}>
+                                    <TableCell className="font-medium">{format(parseISO(duty.date), 'dd MMMM yyyy', { locale: idLocale })}</TableCell>
+                                    <TableCell>{format(parseISO(duty.date), 'EEEE', { locale: idLocale })}</TableCell>
+                                    <TableCell>{duty.user?.name || 'N/A'}</TableCell>
+                                    <TableCell>{duty.user?.houseNumber || 'N/A'}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={duty.attended ? 'default' : 'secondary'} className={duty.attended ? 'bg-green-500' : ''}>
+                                            {duty.attended ? <Check className="mr-1 h-3 w-3"/> : <X className="mr-1 h-3 w-3"/>}
+                                            {duty.attended ? 'Hadir' : 'Menunggu'}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        {duty.userId !== currentUser?.id && !isPast(parseISO(duty.date)) && (
+                                             <Button variant="ghost" size="sm" onClick={() => openSwapDialog(duty)}>
+                                                <ArrowRightLeft className="mr-2 h-4 w-4" />
+                                                Minta Tukar
+                                             </Button>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             </CardContent>
             {selectedDuty && (
                  <SwapRequestDialog

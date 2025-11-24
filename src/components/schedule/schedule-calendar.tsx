@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 
 type EnrichedDuty = Duty & { user: User | undefined };
 
-export function CalendarView() {
+export function ScheduleCalendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [duties, setDuties] = useState<EnrichedDuty[]>([]);
     const [loading, setLoading] = useState(true);
