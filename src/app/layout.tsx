@@ -4,8 +4,8 @@ import { AuthProvider } from '@/lib/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Aplikasi Jaga RT',
-  description: 'Aplikasi penjadwalan dan manajemen tugas komunitas.',
+  title: 'Super App Warga',
+  description: 'Satu aplikasi untuk semua kebutuhan warga. Mudah, cepat, dan terintegrasi.',
 };
 
 export default function RootLayout({
