@@ -21,6 +21,7 @@ import {
   Users2,
   Building,
   ArrowRight,
+  MapPinHouse
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from "@/lib/hooks/use-auth";
@@ -29,7 +30,7 @@ import { cn } from '@/lib/utils';
 
 const features = [
   {
-    title: 'Jadwal Jaga RT',
+    title: 'Siskamling',
     description: 'Lihat dan kelola jadwal jaga keamanan lingkungan.',
     href: '/schedule',
     icon: ShieldCheck,
@@ -98,26 +99,24 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 w-full border-b bg-background">
-        <div className="container flex h-16 items-center justify-between">
+      <header className="sticky top-0 z-40 w-full border-b bg-background p-3">
+        <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-4">
-            <ShieldCheck className="h-8 w-8 text-primary" />
-            <h1 className="text-xl font-bold">RT Online</h1>
+            <MapPinHouse className="h-8 w-8 text-primary" />
+            <h1 className="text-xl font-bold">Super App Warga</h1>
           </Link>
           {user && <UserNav />}
         </div>
-      </header>
-
-      <main className="container py-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight">Super App Warga</h2>
-          <p className="mt-2 text-muted-foreground">
+        <div>
+          <p className="text-muted-foreground">
             Satu aplikasi untuk semua kebutuhan warga. Mudah, cepat, dan terintegrasi.
           </p>
         </div>
+      </header>
 
+      <main className="w-full pb-8 px-3 pt-3">
         {/* Mobile View: Icon Grid */}
-        <div className="mt-12 grid grid-cols-3 gap-4 md:hidden">
+        <div className="grid grid-cols-3 gap-4 md:hidden">
           {features.map((feature) => {
             const isComingSoon = feature.comingSoon;
             const Wrapper = isComingSoon ? 'div' : Link;
@@ -133,14 +132,14 @@ export default function Home() {
                   )}
                 >
                   <feature.icon className="h-8 w-8 text-primary" />
-                  <span className="mt-2 text-center text-xs font-semibold">
+                  <span className="mt-2 text-center text-sm font-semibold">
                     {feature.title}
                   </span>
-                  {isComingSoon && (
-                     <Badge variant="outline" className="mt-1 rounded-full text-[9px] px-1.5 py-0">
-                      Segera
-                    </Badge>
-                  )}
+                  {isComingSoon ? (
+                      <Badge variant="outline">Segera</Badge>
+                    ) : (
+                      <Badge>Tersedia</Badge>
+                    )}
                 </div>
               </Wrapper>
             );
@@ -148,7 +147,7 @@ export default function Home() {
         </div>
 
         {/* Desktop View: Card Grid */}
-        <div className="mt-12 hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {features.map((feature) => {
             const isComingSoon = feature.comingSoon;
             const CardLink = isComingSoon ? 'div' : Link;
